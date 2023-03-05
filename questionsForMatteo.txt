@@ -1,0 +1,8 @@
+If we generate a distribution, after we guess and get a pattern can we just guess the next most
+informative word that is still compatible, or does the distribution's "ranking" change?
+
+Should we be iterating over the guesses and word/pattern pairs and computing the size
+of the pruned dictionary? Or should we be solving the optimization problem as stated
+by Task 5?
+
+In either case, does pre-computing and storing info factor into the solution?
