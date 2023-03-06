@@ -98,12 +98,13 @@ def populate_pattern():
 def pick_guess():
     global words
     global patterns
-    lowest_entropy = 100000000
+    lowest_entropy = float("inf")
     lowest_entropy_guess = ""
 
     print ("words: ", len(words))
 
     for guess in words:
+        # Create a dictionary to keep track of the number of compatible words for each pattern
         entropy = 0
         for pattern in patterns:
             filtered_words = filter_words(guess, pattern)
