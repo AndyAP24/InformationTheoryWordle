@@ -38,21 +38,22 @@ words = []
 patterns = []
 
 #Filter words based on a guess made and resulting pattern.
+#TODO: Optimize this piece of crap.
 def filter_words(guess, pattern):
     global words
     new_words = []
     for word in words:
-       for i in range(len(word)):
-              if word[i] == guess[i] and pattern[i] != "G":
-                    break
-              #Now black squares
-              elif word[i] != guess[i] and pattern[i] == "B":
-                    break
-              elif word[i] != guess[i] and pattern[i] == "Y" and guess[i] in word:
-                    break
-              else:
-                    new_words.append(word)
-
+        flag = False
+        for i in range(len(word)):
+            if pattern[i] == "G" and word[i] != guess[i]:
+                flag = True
+            elif pattern[i] == "B" and guess[i] in word:
+                flag = True
+            elif pattern[i] == "Y" and word[i] == guess[i]:
+                flag = True
+        
+        if flag == False and word != guess:
+            new_words.append(word)
     return new_words
 
  #Filter patterns based on a resulting pattern from a guess. Could do better by taking into account the number of yellows and greens.
