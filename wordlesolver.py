@@ -73,11 +73,6 @@ def filter_patterns(pattern):
                     new_patterns.append(p)  
     return new_patterns
 
-
-            
-    return new_patterns
-
-
 #Calculate entropy of of the target at each step over the possible words left.
 def calculate_entropy(some_words):
     if len(some_words) == 0:
@@ -106,6 +101,11 @@ def pick_guess():
     for guess in words:
         # Create a dictionary to keep track of the number of compatible words for each pattern
         entropy = 0
+        # for target in words:
+            # Find the pattern - generate_pattern
+            # For dict[pattern]
+        # Calculate alpha and keep track on minimum - for each pattern
+
         for pattern in patterns:
             filtered_words = filter_words(guess, pattern)
             entropy += calculate_entropy(filtered_words)
@@ -127,17 +127,13 @@ def generate_pattern(guess, target):
     #If the letter is in the word, but not in the same position, it's yellow (But be careful not to count the same letter twice)
     #If the letter is not in the word, it's black.
 
-    #Get the letters in the target:
-    target_letters = []
-    for letter in target:
-        if letter not in target_letters:
-            target_letters.append(letter)
     for i in range(len(guess)):
         if guess[i] == target[i]:
             pattern += "G"
-        elif guess[i] in target_letters:
+            target = target.replace(guess[i], " ", 1)
+        elif guess[i] in target:
             pattern += "Y"
-            target_letters.remove(guess[i])
+            target = target.replace(guess[i], " ", 1)
         else:
             pattern += "B"
     return pattern
