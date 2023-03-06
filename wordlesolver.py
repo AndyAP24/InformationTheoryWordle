@@ -31,6 +31,7 @@ from collections import defaultdict
 import sys
 import random
 from collections import defaultdict
+import itertools
 
 def filter_words(words, pattern, guess):
     filtered_words = []
@@ -53,10 +54,38 @@ def wordlesolver(words_file, target):
     if target not in words:
         print("Target not in words file")
         sys.exit(1)
+
+def pattern_gen():
+    """
+    Returns a list of all possible 'BGY' patterns of size 5
+    """
+    return [numToPattern(n) for n in range(3**5)]
+
+def numToPattern(n):
+    """
+    Converts number to a ternary digit using "B", "Y", and "G"
+    """
+    if n == 0:
+        return "BBBBB"
+    ps = []
+    while n:
+        n, r = divmod(n, 3)
+        ps.append(numToLetter(r))
     
+    while len(ps) < 5: # pad out "B"s (aka 0s)
+        ps.append("B")
 
+    return ''.join(reversed(ps))
 
-
+def numToLetter(k):
+    assert k >= 0, "invalid value for num"
+    assert k < 3, "invalid value for num"
+    if k == 0:
+        return "B"
+    if k == 1:
+        return "Y"
+    if k == 2:
+        return "G"
 
 
 if __name__ == "__main__":
