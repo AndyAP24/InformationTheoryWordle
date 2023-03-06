@@ -25,17 +25,99 @@
 import math
 import sys
 import random
+import itertools as it
 from collections import defaultdict
 
 
-import sys
-import random
-from collections import defaultdict
+#Global variables:
 
-def filter_words(words, pattern, guess):
-    filtered_words = []
-    return filtered_words
+#Possible words left
+words = []
 
+#Possible patterns left
+patterns = []
+
+#Filter words based on a guess made and resulting pattern.
+def filter_words(guess, pattern):
+    global words
+    new_words = []
+    for word in words:
+       for i in range(len(word)):
+           if word[i] != guess[i] and pattern[i] != "G":
+               break
+           elif word[i] == guess[i] and pattern[i] == "B":
+               break
+           elif word[i] != guess[i] and pattern[i] == "Y":
+               break
+           else:
+               new_words.append(word)
+    return new_words
+
+ #Filter patterns based on a resulting pattern from a guess. Could do better by taking into account the number of yellows and greens.
+def filter_patterns(pattern):
+    global patterns
+    new_patterns = []
+    for p in patterns:
+        for i in range(len(p)):
+            if p[i] != pattern[i] and pattern[i] != "G":
+                break
+            else:
+                new_patterns.append(p)
+    return new_patterns
+
+
+#Calculate entropy of of the target at each step over the possible words left.
+def calculate_entropy(some_words):
+    if len(some_words) == 0:
+        return 0
+    entropy = - 1/len(some_words) * math.log2(1/len(some_words))
+    return entropy
+
+#Generate all possible patterns (Combinations of 5 letters, each letter can be Y, B, or G)
+def populate_pattern():
+    pattern = []
+    for i in it.product("YBG", repeat=5):
+        pattern.append("".join(i))
+    return pattern
+
+#Pick a guess. This is the meat of the program. 
+#For every possible guess resulting in every possible pattern, calculate the entropy of the target.
+#Pick the guess that results in the lowest entropy average over all patterns.
+def pick_guess():
+    global words
+    global patterns
+    lowest_entropy = 1
+    lowest_entropy_guess = ""
+
+    print ("words: ", len(words))
+
+    for guess in words:
+        entropy = 0
+        for pattern in patterns:
+            filtered_words = filter_words(guess, pattern)
+            entropy += calculate_entropy(filtered_words)
+        
+        entropy = entropy/len(patterns)
+        if entropy < lowest_entropy:
+            lowest_entropy = entropy
+            lowest_entropy_guess = guess
+    print (lowest_entropy_guess, lowest_entropy)
+    return lowest_entropy_guess
+
+
+#Generate pattern after a guess has been made.
+def generate_pattern(guess, target):
+    pattern = ""
+    for i in range(len(guess)):
+        if guess[i] == target[i]:
+            pattern += "G"
+        elif guess[i] in target:
+            pattern += "Y"
+        else:
+            pattern += "B"
+    return pattern
+
+#Load words from file
 def load_words(file):
     words = []
     with open(file, "r") as f:
@@ -48,16 +130,38 @@ def load_words(file):
                 sys.exit(1)
     return words
 
+
+
+#This is supposed to do the whole thing.
 def wordlesolver(words_file, target):
-    words = load_words(words_file)
+    global words; words = load_words(words_file)
     if target not in words:
         print("Target not in words file")
         sys.exit(1)
+    global patterns; patterns = populate_pattern()
+    
+    #Now make a guess
+    guess = pick_guess()
+    
+    #Generate pattern based on guess
+    pattern = generate_pattern(guess, target)
+    print (pattern)
+
+    #Filter words and patterns based on guess
+    words = filter_words(guess, pattern)
+
+    #Filter patterns based on pattern
+    patterns = filter_patterns(pattern)
+
+    #Make another guess
+    guess = pick_guess()
+
+
     
 
 
 
-
+    
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
