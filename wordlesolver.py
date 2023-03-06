@@ -43,14 +43,16 @@ def filter_words(guess, pattern):
     new_words = []
     for word in words:
        for i in range(len(word)):
-           if word[i] != guess[i] and pattern[i] != "G":
-               break
-           elif word[i] == guess[i] and pattern[i] == "B":
-               break
-           elif word[i] != guess[i] and pattern[i] == "Y":
-               break
-           else:
-               new_words.append(word)
+              if word[i] == guess[i] and pattern[i] != "G":
+                    break
+              #Now black squares
+              elif word[i] != guess[i] and pattern[i] == "B":
+                    break
+              elif word[i] != guess[i] and pattern[i] == "Y" and guess[i] in word:
+                    break
+              else:
+                    new_words.append(word)
+
     return new_words
 
  #Filter patterns based on a resulting pattern from a guess. Could do better by taking into account the number of yellows and greens.
@@ -70,7 +72,7 @@ def filter_patterns(pattern):
 def calculate_entropy(some_words):
     if len(some_words) == 0:
         return 0
-    entropy = - 1/len(some_words) * math.log2(1/len(some_words))
+    entropy = math.log2(len(some_words))
     return entropy
 
 #Generate all possible patterns (Combinations of 5 letters, each letter can be Y, B, or G)
@@ -86,7 +88,7 @@ def populate_pattern():
 def pick_guess():
     global words
     global patterns
-    lowest_entropy = 1
+    lowest_entropy = 100000000
     lowest_entropy_guess = ""
 
     print ("words: ", len(words))
@@ -142,19 +144,19 @@ def wordlesolver(words_file, target):
     
     #Now make a guess
     guess = pick_guess()
+
+    #Do the above steps in a loop until you get the target.
+    while guess != target:
+        pattern = generate_pattern(guess, target)
+        print (pattern)
+        words = filter_words(guess, pattern)
+        patterns = filter_patterns(pattern)
+        guess = pick_guess()
+        if len(words) == 0:
+            print("No words left")
+            sys.exit(1)
+        
     
-    #Generate pattern based on guess
-    pattern = generate_pattern(guess, target)
-    print (pattern)
-
-    #Filter words and patterns based on guess
-    words = filter_words(guess, pattern)
-
-    #Filter patterns based on pattern
-    patterns = filter_patterns(pattern)
-
-    #Make another guess
-    guess = pick_guess()
 
 
     
