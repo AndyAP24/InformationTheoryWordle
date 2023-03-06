@@ -60,11 +60,20 @@ def filter_patterns(pattern):
     global patterns
     new_patterns = []
     for p in patterns:
-        for i in range(len(p)):
-            if p[i] != pattern[i] and pattern[i] != "G":
-                break
-            else:
-                new_patterns.append(p)
+        #If the a square is green in the pattern, it must be green in the new pattern.
+        #The number of greens + number of yellows must not decrease.
+        if p.count("G") + p.count("Y") >= pattern.count("G") + pattern.count("Y"):
+            for i in range(len(p)):
+                flag = False
+                if pattern[i] == "G" and p[i] != "G":
+                    flag = True
+                    break
+                if flag == False:
+                    new_patterns.append(p)  
+    return new_patterns
+
+
+            
     return new_patterns
 
 
@@ -100,9 +109,11 @@ def pick_guess():
             entropy += calculate_entropy(filtered_words)
         
         entropy = entropy/len(patterns)
+
         if entropy < lowest_entropy:
             lowest_entropy = entropy
             lowest_entropy_guess = guess
+        
     print (lowest_entropy_guess, lowest_entropy)
     return lowest_entropy_guess
 
@@ -110,14 +121,25 @@ def pick_guess():
 #Generate pattern after a guess has been made.
 def generate_pattern(guess, target):
     pattern = ""
+    #If the letter is in the same position, it's green.
+    #If the letter is in the word, but not in the same position, it's yellow (But be careful not to count the same letter twice)
+    #If the letter is not in the word, it's black.
+
+    #Get the letters in the target:
+    target_letters = []
+    for letter in target:
+        if letter not in target_letters:
+            target_letters.append(letter)
     for i in range(len(guess)):
         if guess[i] == target[i]:
             pattern += "G"
-        elif guess[i] in target:
+        elif guess[i] in target_letters:
             pattern += "Y"
+            target_letters.remove(guess[i])
         else:
             pattern += "B"
     return pattern
+        
 
 #Load words from file
 def load_words(file):
