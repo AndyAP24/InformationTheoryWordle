@@ -98,26 +98,41 @@ def pick_guess():
 
     print ("words: ", len(words))
 
+    min_alpha = float("inf")
+    best_guess = "No guess found"
+
     for guess in words:
+        pattern_dict = {}
         # Create a dictionary to keep track of the number of compatible words for each pattern
         entropy = 0
-        # for target in words:
-            # Find the pattern - generate_pattern
-            # For dict[pattern]
+        for t in words:
+            # Find the pattern
+            pattern = generate_pattern(guess, t)
+            count = pattern_dict.get(pattern)
+            if count is None:
+                pattern_dict[pattern] = 1
+            else:
+                pattern_dict[pattern] = count + 1
+        alpha = 0
+        for v in pattern_dict.values():
+            alpha = alpha + math.log2(v)
+        if alpha < min_alpha:
+            alpha = min_alpha
+            best_guess = guess
         # Calculate alpha and keep track on minimum - for each pattern
 
-        for pattern in patterns:
-            filtered_words = filter_words(guess, pattern)
-            entropy += calculate_entropy(filtered_words)
+        # for pattern in patterns:
+        #     filtered_words = filter_words(guess, pattern)
+        #     entropy += calculate_entropy(filtered_words)
+        #
+        # entropy = entropy/len(patterns)
+        #
+        # if entropy < lowest_entropy:
+        #     lowest_entropy = entropy
+        #     lowest_entropy_guess = guess
         
-        entropy = entropy/len(patterns)
-
-        if entropy < lowest_entropy:
-            lowest_entropy = entropy
-            lowest_entropy_guess = guess
-        
-    print (lowest_entropy_guess, lowest_entropy)
-    return lowest_entropy_guess
+    print(best_guess, min_alpha)
+    return best_guess
 
 
 #Generate pattern after a guess has been made.
