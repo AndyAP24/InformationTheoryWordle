@@ -114,10 +114,12 @@ def pick_guess():
             else:
                 pattern_dict[pattern] = count + 1
         alpha = 0
+        # Iterate through each pattern and add log of the size of the pruned alphabet
         for v in pattern_dict.values():
             alpha = alpha + math.log2(v)
+        # print(guess + " " + str(pattern_dict) + " " + str(alpha))
         if alpha < min_alpha:
-            alpha = min_alpha
+            min_alpha = alpha
             best_guess = guess
         # Calculate alpha and keep track on minimum - for each pattern
 
@@ -190,12 +192,6 @@ def wordlesolver(words_file, target):
         if len(words) == 0:
             print("No words left")
             sys.exit(1)
-        
-    
-
-
-    
-
 
 
     
