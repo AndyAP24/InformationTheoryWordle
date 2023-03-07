@@ -106,8 +106,8 @@ def pick_guess():
     best_guess = "No guess found"
 
     for guess in words:
-        pattern_dict = {}
         # Create a dictionary to keep track of the number of compatible words for each pattern
+        pattern_dict = {}
         for t in words:
             # Find the pattern
             pattern = generate_pattern(guess, t)
@@ -122,8 +122,10 @@ def pick_guess():
                 pattern_dict[pattern] = count + 1
         alpha = 0
         # Iterate through each pattern and add log of the size of the pruned alphabet
-        for v in pattern_dict.values():
-            alpha = alpha + math.log2(v)
+        for w in words:
+            p = generate_pattern(guess, w)
+            count = pattern_dict[p]
+            alpha = alpha + math.log2(count)
         
         alpha = alpha / len(pattern_dict)
         # print(guess + " " + str(pattern_dict) + " " + str(alpha))
@@ -191,7 +193,8 @@ def wordlesolver(words_file, target):
     patterns = populate_pattern()
 
     print ("Initial patterns: ", len(patterns))
-    guess = pick_guess()
+    # guess = pick_guess()
+    guess = "crane"
 
     #Do the above steps in a loop until you get the target.
     while guess != target:
