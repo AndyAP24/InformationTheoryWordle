@@ -77,7 +77,6 @@ def filter_patterns(pattern):
                     break
             if flag == False:
                 new_patterns.append(p)
-    print ("patterns: ", len(new_patterns))
     patterns = new_patterns
 #Calculate entropy of of the target at each step over the possible words left.
 def calculate_entropy(some_words):
@@ -100,7 +99,6 @@ def pick_guess():
     global words
     global patterns
 
-    print (len(patterns))
 
     print ("words: ", len(words))
 
@@ -126,6 +124,8 @@ def pick_guess():
         # Iterate through each pattern and add log of the size of the pruned alphabet
         for v in pattern_dict.values():
             alpha = alpha + math.log2(v)
+        
+        alpha = alpha / len(pattern_dict)
         # print(guess + " " + str(pattern_dict) + " " + str(alpha))
         if alpha < min_alpha:
             min_alpha = alpha
@@ -191,12 +191,12 @@ def wordlesolver(words_file, target):
     patterns = populate_pattern()
 
     print ("Initial patterns: ", len(patterns))
-    guess = "No guess found"
+    guess = pick_guess()
 
     #Do the above steps in a loop until you get the target.
     while guess != target:
         
-        guess = pick_guess()
+        
         pattern = generate_pattern(guess, target)
         print (pattern)
         filter_patterns(pattern)
@@ -208,6 +208,8 @@ def wordlesolver(words_file, target):
         if len(words) == 0:
             print("No words left")
             sys.exit(1)
+        
+        guess = pick_guess()
 
 
     
