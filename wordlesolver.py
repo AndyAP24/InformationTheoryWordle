@@ -38,29 +38,36 @@ words = []
 global patterns;
 patterns = []
 
-#Filter words based on a guess made and resulting pattern.
-#TODO: Optimize this piece of crap.
-def filter_words(guess, pattern):
+
+def filter_words(guess, pattern):  # Filter words based on a guess made and resulting pattern
     global words
     new_words = []
     for word in words:
+        guess_copy = list(guess)
         flag = False
-        for i in range(len(word)):
-            if pattern[i] == "G" and word[i] != guess[i]:
-                flag = True
-            elif pattern[i] == "B" and guess[i] in word:
-                #Current issue: If the guess is colog and the word is rossa, it will be filtered out. This is not correct.
-
-                if word[i] == guess[i]:
+        if word is guess:
+            flag = True
+        i = 0
+        while not flag and i < len(pattern):
+            if pattern[i] is "G":
+                if word[i] is guess[i]:  # Remove matching letters in word and guess
+                    guess_copy[i] = ""
+                else:  # We know this word is incompatible
                     flag = True
-            elif pattern[i] == "Y" and word[i] == guess[i]:
-                flag = True
-            elif pattern[i] == "Y" and guess[i] not in word:
-                flag = True
-        
-        if flag == False and word != guess:
+            elif pattern[i] is "Y":
+                if word[i] in guess_copy:  # Remove letters we found in word
+                    ind = guess_copy.index(word[i])
+                    guess_copy[ind] = ""
+                else:  # We know this word is incompatible
+                    flag = True
+            else:  # Pattern at i is black
+                if word[i] in guess_copy:  # We know this word is incompatible
+                    flag = True
+            i += 1
+        if not flag:
             new_words.append(word)
     return new_words
+
 
  #Filter patterns based on a resulting pattern from a guess. Could do better by taking into account the number of yellows and greens.
 def filter_patterns(pattern):
