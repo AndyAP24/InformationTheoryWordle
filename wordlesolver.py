@@ -35,6 +35,7 @@ from collections import defaultdict
 words = []
 
 #Possible patterns left
+global patterns;
 patterns = []
 
 #Filter words based on a guess made and resulting pattern.
@@ -48,8 +49,13 @@ def filter_words(guess, pattern):
             if pattern[i] == "G" and word[i] != guess[i]:
                 flag = True
             elif pattern[i] == "B" and guess[i] in word:
-                flag = True
+                #Current issue: If the guess is colog and the word is rossa, it will be filtered out. This is not correct.
+
+                if word[i] == guess[i]:
+                    flag = True
             elif pattern[i] == "Y" and word[i] == guess[i]:
+                flag = True
+            elif pattern[i] == "Y" and guess[i] not in word:
                 flag = True
         
         if flag == False and word != guess:
@@ -63,16 +69,16 @@ def filter_patterns(pattern):
     for p in patterns:
         #If the a square is green in the pattern, it must be green in the new pattern.
         #The number of greens + number of yellows must not decrease.
-        if p.count("G") + p.count("Y") >= pattern.count("G") + pattern.count("Y"):
+        if (p.count("G") + p.count("Y")) >= (pattern.count("G") + pattern.count("Y")):
+            flag = False
             for i in range(len(p)):
-                flag = False
                 if pattern[i] == "G" and p[i] != "G":
                     flag = True
                     break
-                if flag == False:
-                    new_patterns.append(p)  
-    return new_patterns
-
+            if flag == False:
+                new_patterns.append(p)
+    print ("patterns: ", len(new_patterns))
+    patterns = new_patterns
 #Calculate entropy of of the target at each step over the possible words left.
 def calculate_entropy(some_words):
     if len(some_words) == 0:
@@ -93,8 +99,8 @@ def populate_pattern():
 def pick_guess():
     global words
     global patterns
-    lowest_entropy = float("inf")
-    lowest_entropy_guess = ""
+
+    print (len(patterns))
 
     print ("words: ", len(words))
 
@@ -104,10 +110,13 @@ def pick_guess():
     for guess in words:
         pattern_dict = {}
         # Create a dictionary to keep track of the number of compatible words for each pattern
-        entropy = 0
         for t in words:
             # Find the pattern
             pattern = generate_pattern(guess, t)
+            
+            if pattern not in patterns:
+                continue
+            # Add the pattern to the dictionary
             count = pattern_dict.get(pattern)
             if count is None:
                 pattern_dict[pattern] = 1
@@ -121,17 +130,7 @@ def pick_guess():
         if alpha < min_alpha:
             min_alpha = alpha
             best_guess = guess
-        # Calculate alpha and keep track on minimum - for each pattern
 
-        # for pattern in patterns:
-        #     filtered_words = filter_words(guess, pattern)
-        #     entropy += calculate_entropy(filtered_words)
-        #
-        # entropy = entropy/len(patterns)
-        #
-        # if entropy < lowest_entropy:
-        #     lowest_entropy = entropy
-        #     lowest_entropy_guess = guess
         
     print(best_guess, min_alpha)
     return best_guess
@@ -139,21 +138,32 @@ def pick_guess():
 
 #Generate pattern after a guess has been made.
 def generate_pattern(guess, target):
-    pattern = ""
+    pattern = ["B", "B", "B", "B", "B"]
+    #Make target a list so we can replace letters.
+    target = list(target)
+    guess = list(guess)
+
     #If the letter is in the same position, it's green.
     #If the letter is in the word, but not in the same position, it's yellow (But be careful not to count the same letter twice)
     #If the letter is not in the word, it's black.
+    for i in range(len(target)):
+        if target[i] == guess[i]:
+            pattern[i] = "G"
+            target[i] = " "
+            guess[i] = " "
+    
+    for i in range(len(target)):
+        if guess[i] in target and guess[i] != " ":
+            pattern[i] = "Y"
+            target[target.index(guess[i])] = " "
+            guess[i] = " "
+    
 
-    for i in range(len(guess)):
-        if guess[i] == target[i]:
-            pattern += "G"
-            target = target.replace(guess[i], " ", 1)
-        elif guess[i] in target:
-            pattern += "Y"
-            target = target.replace(guess[i], " ", 1)
-        else:
-            pattern += "B"
-    return pattern
+
+        
+
+    
+    return "".join(pattern)
         
 
 #Load words from file
@@ -177,18 +187,24 @@ def wordlesolver(words_file, target):
     if target not in words:
         print("Target not in words file")
         sys.exit(1)
-    global patterns; patterns = populate_pattern()
-    
-    #Now make a guess
-    guess = pick_guess()
+    global patterns
+    patterns = populate_pattern()
+
+    print ("Initial patterns: ", len(patterns))
+    guess = "No guess found"
 
     #Do the above steps in a loop until you get the target.
     while guess != target:
+        
+        guess = pick_guess()
         pattern = generate_pattern(guess, target)
         print (pattern)
+        filter_patterns(pattern)
         words = filter_words(guess, pattern)
-        patterns = filter_patterns(pattern)
-        guess = pick_guess()
+        
+        if guess == target:
+            print ("Target found")
+            sys.exit(0)
         if len(words) == 0:
             print("No words left")
             sys.exit(1)
