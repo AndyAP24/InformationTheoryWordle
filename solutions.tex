@@ -1,0 +1,59 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Solving Wordle using Information Theory}
+\author{Andy Arrigony Pérez, Maryam Abuissa, Daniel Flores García}
+\date{March 2023}
+
+\begin{document}
+
+\maketitle
+
+\section{Task 6}
+
+Suppose there are multiple guesses $g_1, g_2, ..., g_k \in W$ with the same minimum value for $\alpha_{g_1} = \alpha_{g_2} = ... = \alpha_{g_k}$. Then, let $\pi$ be a distribution s.t. $\sum_{i =1}^{k} \pi(g_i) = 1$ and $\pi(g_i) \geq 0$. Note that $\pi(g_j) = 0 \,\,\, \forall g_j \in W$ s.t.  $g_j \neq g_i$. Additionally, let $\alpha_{\phi} = \alpha_{g_i}$ for any $i \in [1,..,k].$ Consider:
+
+\[
+    \frac{1}{|W|}\sum_{g \in W} \pi(g) \alpha_g = \frac{1}{|W|}\sum_{i = 1}^{k} \pi(g_i) \alpha_\phi = \frac{\alpha_\phi}{|W|}\sum_{i=1}^{k}\pi(g_i) 
+\]
+\[
+    = \frac{\alpha_\phi}{|W|}
+\]
+
+Now, to show that $\pi$ is optimal, we show that for an arbitrary distribution $\pi^*$, $ \frac{1}{|W|}\sum_{g \in W} \pi^*(g) \alpha_g \geq  \frac{1}{|W|}\sum_{g \in W} \pi(g) \alpha_g$. Let $g_j$ be a guess such that $g_j \neq g_i \,\,\, \forall  i \in [1, ..., k], \forall j \in [1, ..., t]$. Consider:
+
+
+
+\[
+    \frac{1}{|W|}\sum_{g \in W} \pi^*(g) = \frac{1}{|W|}(\sum_{i = 1}^{k} \pi^*(g_i) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j)\alpha_j)
+\]
+
+But note that: 
+
+\[
+    \sum_{j = 1}^{t} \pi^*(g_j)\alpha_j = \sum_{j = 1}^{t} \pi^*(g_j) (\alpha_\phi + \beta_j)
+\]
+
+for some $\beta_j \geq 0$, because $\alpha_\phi$ is minimum and $\geq 0$. So:
+
+\[
+    = \sum_{j = 1}^{t} \pi^*(g_j) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j) \beta_j
+\]
+
+Plugging this into the earlier expression: 
+
+\[
+    \frac{1}{|W|}(\sum_{i = 1}^{k} \pi^*(g_i) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j)\alpha_j) = \frac{1}{|W|}(\sum_{i = 1}^{k} \pi^*(g_i) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j) \beta_j)
+\]
+
+\[
+    = \frac{1}{|W|}(\alpha_\phi (\sum_{i = 1}^{k} \pi^*(g_i)  + \sum_{j = 1}^{t} \pi^*(g_j)) + \sum_{j = 1}^{t} \pi^*(g_j) \beta_j) = \frac{1}{|W|}(\alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j) \beta_j)
+\]
+
+Because $\sum_{j = 1}^{t} \pi^*(g_j) \geq 0$:
+
+\[
+    \geq \frac{\alpha_\phi}{|W|}
+\]
+
+\end{document}
