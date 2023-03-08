@@ -1,3 +1,4 @@
 Should we be iterating through the words and their corresponding patterns
 (rather than iterating through patterns) when calculating alpha?
 
+Should we be filtering patterns?
