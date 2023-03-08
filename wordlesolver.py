@@ -224,7 +224,7 @@ def pattern_check(p, t):
         sys.exit(1)
     global patterns
     patterns = populate_pattern()
-    return filter_words(p, t)
+    return filter_words(t, p)
 
 
 
