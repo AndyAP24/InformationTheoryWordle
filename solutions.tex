@@ -13,29 +13,29 @@
 
 \section{Task 1}
 
-Consider $I[T; G] = H(T) - H(T|G)$. But note that $H(T) = H(T|G)$ because $T$ and $G$ are independent. So $I[T; G] = 0$.
+Consider $I[T; G] = H(T) - H(T|G)$. Note that $H(T) = H(T|G)$ because $T$ and $G$ are independent. So $I[T; G] = 0$.
 
 \section{Task 2}
 
-Consider $I[T;G|P] = H(T|P) - H(T|G,P)$. But note that $H(T|P) > H(T|G,P)$, intuitively because knowing both the guess and the pattern leads to less uncertainty about $T$ than knowing just the pattern.
+Consider $I[T;G|P] = H(T|P) - H(T|G,P)$. Note that $H(T|P) > H(T|G,P)$, intuitively because knowing both the guess and the pattern tells you more about $T$ than knowing just the pattern. Then $I[T;G|P] > 0$$
 
 \section{Task 3}
 
-If we know both the guess and the target, we can deduce the pattern. Hence, $H[P | G, T] = 0$.
+The pattern is defined as a function of the guess and the target. Then if we have the guess and target, we know the pattern, so $H[P | G, T] = 0$.
 
 \section{Task 4}
 
-Consider: $I[T; P|G] = H(T|G) - H(T|P,G)$. But note that $H(T|G) = H(T) - I[T;G] = H(T)$, which does not depend on $\pi$. Thus, we need to minimize the subtractive term $H(T|P,G)$ (since it \emph{does} depend on $\pi$) in order to maximize $I[T; P|G]$.
+Consider $I[T; P|G] = H(T|G) - H(T|P,G)$. Note that $H(T|G) = H(T) - I[T;G] = H(T)$ by Task 1, which does not depend on $\pi$. Thus, we can ignore $H(T|G)$ when maximizing $I[T; P|G]$, and all we have to do is minimize $H(T|P,G)$, which \emph{does} depend on $\pi$.
 
 \section{Task 5}
 
-Let $R$ be the alphabet of $P$. Consider:
+Let $R$ be the alphabet of patterns. Consider:
 
 \[
   H[T|G,P] = \sum_{t \in W} \sum_{g \in W} \sum_{r \in R} p(t, g, r)\log (\frac{1}{p(t|g,r)}) = \sum_{t \in W} \sum_{g \in W} \sum_{r \in R} p(r | t,g)p(t,g) \log(\frac{1}{p(t|g,r)})
 \]
 
-But note that $\exists r' \in R$ s.t. $p(r'  |t,g) = 1$ and therefore $p(r^* |t,g) = 0 \, \,\forall r^* \in R$ s.t. $r* \neq r'$. Therefore:
+But note that $\exists r' \in R$ s.t. $p(r'  |t,g) = 1$ and therefore $\forall r^* \in R$ s.t. $r^* \neq r'$, $p(r^* |t,g) = 0$. Therefore:
 
 \[
     = \sum_{t \in W} \sum_{g \in W} p(t,g) \log (\frac{1}{p(t|g,r')})
@@ -50,7 +50,7 @@ Moreover, by uniformity of $T$, $p(t|g,r') = \frac{1}{|W'(g,t)|}$, where $W'(g,t
 And letting $\alpha_g = \sum_{t \in W}  \log(|W'(g,t)|)$:
 
 \[
-    = \frac{1}{|W|}\sum_{g \in W} \pi(g) \alpha_g   
+    = \frac{1}{|W|}\sum_{g \in W} \pi(g) \alpha_g
 \]
 
 \section{Task 6}
@@ -58,7 +58,7 @@ And letting $\alpha_g = \sum_{t \in W}  \log(|W'(g,t)|)$:
 Suppose there are multiple guesses $g_1, g_2, ..., g_k \in W$ with the same minimum value for $\alpha_{g_1} = \alpha_{g_2} = ... = \alpha_{g_k}$. Then, let $\pi$ be a distribution s.t. $\sum_{i =1}^{k} \pi(g_i) = 1$ and $\pi(g_i) \geq 0$. Note that $\pi(g_j) = 0 \,\,\, \forall g_j \in W$ s.t.  $g_j \neq g_i$. Additionally, let $\alpha_{\phi} = \alpha_{g_i}$ for any $i \in [1,..,k].$ Consider:
 
 \[
-    \frac{1}{|W|}\sum_{g \in W} \pi(g) \alpha_g = \frac{1}{|W|}\sum_{i = 1}^{k} \pi(g_i) \alpha_\phi = \frac{\alpha_\phi}{|W|}\sum_{i=1}^{k}\pi(g_i) 
+    \frac{1}{|W|}\sum_{g \in W} \pi(g) \alpha_g = \frac{1}{|W|}\sum_{i = 1}^{k} \pi(g_i) \alpha_\phi = \frac{\alpha_\phi}{|W|}\sum_{i=1}^{k}\pi(g_i)
 \]
 \[
     = \frac{\alpha_\phi}{|W|}
@@ -72,7 +72,7 @@ Now, to show that $\pi$ is optimal, we show that for an arbitrary distribution $
     \frac{1}{|W|}\sum_{g \in W} \pi^*(g) = \frac{1}{|W|}(\sum_{i = 1}^{k} \pi^*(g_i) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j)\alpha_j)
 \]
 
-But note that: 
+But note that:
 
 \[
     \sum_{j = 1}^{t} \pi^*(g_j)\alpha_j = \sum_{j = 1}^{t} \pi^*(g_j) (\alpha_\phi + \beta_j)
@@ -84,7 +84,7 @@ for some $\beta_j \geq 0$, because $\alpha_\phi$ is minimum and $\geq 0$. So:
     = \sum_{j = 1}^{t} \pi^*(g_j) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j) \beta_j
 \]
 
-Plugging this into the earlier expression: 
+Plugging this into the earlier expression:
 
 \[
     \frac{1}{|W|}(\sum_{i = 1}^{k} \pi^*(g_i) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j)\alpha_j) = \frac{1}{|W|}(\sum_{i = 1}^{k} \pi^*(g_i) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j) \alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j) \beta_j)
@@ -92,12 +92,9 @@ Plugging this into the earlier expression:
 
 \[
     = \frac{1}{|W|}(\alpha_\phi (\sum_{i = 1}^{k} \pi^*(g_i)  + \sum_{j = 1}^{t} \pi^*(g_j)) + \sum_{j = 1}^{t} \pi^*(g_j) \beta_j) = \frac{1}{|W|}(\alpha_\phi + \sum_{j = 1}^{t} \pi^*(g_j) \beta_j)
-\]
-
-Because $\sum_{j = 1}^{t} \pi^*(g_j) \geq 0$:
-
-\[
     \geq \frac{\alpha_\phi}{|W|}
 \]
+
+Where the last inequality is because $\sum_{j = 1}^{t} \pi^*(g_j) \geq 0$.
 
 \end{document}
