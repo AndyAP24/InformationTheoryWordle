@@ -49,12 +49,12 @@ def filter_words(guess, pattern):  # Filter words based on a guess made and resu
             flag = True
         i = 0
         while not flag and i < len(pattern):
-            if pattern[i] is "G":
+            if pattern[i] == "G":
                 if word[i] is guess[i]:  # Remove matching letters in word and guess
                     guess_copy[i] = ""
                 else:  # We know this word is incompatible
                     flag = True
-            elif pattern[i] is "Y":
+            elif pattern[i] == "Y":
                 if word[i] in guess_copy:  # Remove letters we found in word
                     ind = guess_copy.index(word[i])
                     guess_copy[ind] = ""
@@ -131,6 +131,8 @@ def pick_guess():
         # Iterate through each pattern and add log of the size of the pruned alphabet
         for w in words:
             p = generate_pattern(guess, w)
+            if p not in patterns:
+                continue
             count = pattern_dict[p]
             alpha = alpha + math.log2(count)
         
@@ -200,8 +202,8 @@ def wordlesolver(words_file, target):
     patterns = populate_pattern()
 
     print ("Initial patterns: ", len(patterns))
-    # guess = pick_guess()
-    guess = "crane"
+    guess = pick_guess()
+    # guess = "crane"
 
     #Do the above steps in a loop until you get the target.
     while guess != target:
