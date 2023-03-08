@@ -35,8 +35,6 @@ from collections import defaultdict
 words = []
 
 #Possible patterns left
-global patterns;
-patterns = []
 
 #Filter words based on a guess made and resulting pattern.
 #TODO: Optimize this piece of crap.
@@ -44,40 +42,10 @@ def filter_words(guess, pattern):
     global words
     new_words = []
     for word in words:
-        flag = False
-        for i in range(len(word)):
-            if pattern[i] == "G" and word[i] != guess[i]:
-                flag = True
-            elif pattern[i] == "B" and guess[i] in word:
-                #Current issue: If the guess is colog and the word is rossa, it will be filtered out. This is not correct.
-
-                if word[i] == guess[i]:
-                    flag = True
-            elif pattern[i] == "Y" and word[i] == guess[i]:
-                flag = True
-            elif pattern[i] == "Y" and guess[i] not in word:
-                flag = True
-        
-        if flag == False and word != guess:
+        if generate_pattern(guess, word) == pattern:
             new_words.append(word)
     return new_words
 
- #Filter patterns based on a resulting pattern from a guess. Could do better by taking into account the number of yellows and greens.
-def filter_patterns(pattern):
-    global patterns
-    new_patterns = []
-    for p in patterns:
-        #If the a square is green in the pattern, it must be green in the new pattern.
-        #The number of greens + number of yellows must not decrease.
-        if (p.count("G") + p.count("Y")) >= (pattern.count("G") + pattern.count("Y")):
-            flag = False
-            for i in range(len(p)):
-                if pattern[i] == "G" and p[i] != "G":
-                    flag = True
-                    break
-            if flag == False:
-                new_patterns.append(p)
-    patterns = new_patterns
 #Calculate entropy of of the target at each step over the possible words left.
 def calculate_entropy(some_words):
     if len(some_words) == 0:
@@ -85,19 +53,11 @@ def calculate_entropy(some_words):
     entropy = math.log2(len(some_words))
     return entropy
 
-#Generate all possible patterns (Combinations of 5 letters, each letter can be Y, B, or G)
-def populate_pattern():
-    pattern = []
-    for i in it.product("YBG", repeat=5):
-        pattern.append("".join(i))
-    return pattern
-
 #Pick a guess. This is the meat of the program. 
 #For every possible guess resulting in every possible pattern, calculate the entropy of the target.
 #Pick the guess that results in the lowest entropy average over all patterns.
 def pick_guess():
     global words
-    global patterns
 
 
     print ("words: ", len(words))
@@ -111,9 +71,7 @@ def pick_guess():
         for t in words:
             # Find the pattern
             pattern = generate_pattern(guess, t)
-            
-            if pattern not in patterns:
-                continue
+
             # Add the pattern to the dictionary
             count = pattern_dict.get(pattern)
             if count is None:
@@ -127,7 +85,7 @@ def pick_guess():
             count = pattern_dict[p]
             alpha = alpha + math.log2(count)
         
-        alpha = alpha / len(pattern_dict)
+        # alpha = alpha / len(pattern_dictn
         # print(guess + " " + str(pattern_dict) + " " + str(alpha))
         if alpha < min_alpha:
             min_alpha = alpha
@@ -189,12 +147,9 @@ def wordlesolver(words_file, target):
     if target not in words:
         print("Target not in words file")
         sys.exit(1)
-    global patterns
-    patterns = populate_pattern()
 
-    print ("Initial patterns: ", len(patterns))
-    # guess = pick_guess()
-    guess = "crane"
+    guess = pick_guess()
+    # guess = "crane"
 
     #Do the above steps in a loop until you get the target.
     while guess != target:
@@ -202,7 +157,6 @@ def wordlesolver(words_file, target):
         
         pattern = generate_pattern(guess, target)
         print (pattern)
-        filter_patterns(pattern)
         words = filter_words(guess, pattern)
         
         if guess == target:
@@ -222,8 +176,6 @@ def pattern_check(p, t):
     if t not in words:
         print(f"Target {t} not in words file")
         sys.exit(1)
-    global patterns
-    patterns = populate_pattern()
     return filter_words(t, p)
 
 
