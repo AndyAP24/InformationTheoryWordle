@@ -215,7 +215,18 @@ def wordlesolver(words_file, target):
         guess = pick_guess()
 
 
-    
+def pattern_check(p, t):
+    words_file = "wordlewords.txt"
+    global words
+    words = load_words(words_file)
+    if t not in words:
+        print(f"Target {t} not in words file")
+        sys.exit(1)
+    global patterns
+    patterns = populate_pattern()
+    return filter_words(p, t)
+
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:

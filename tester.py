@@ -7,10 +7,10 @@ def test_pattern_gen():
     assert pattern == "GYGBB", f"Generated {pattern} instead of GYGBB"
 
 def test_pattern_check():
-    pattern = wordlesolver.generate_pattern("array", "tasks")
+    pattern = wordlesolver.generate_pattern("array", "nahal")
     print(pattern)
-    assert "tasks" in wordlesolver.filter_words(pattern, "array"), "Pattern check not working, case 1."
-    assert "tasks" not in wordlesolver.filter_words(pattern, "krane"), "Pattern check not working, case 2."
+    assert "nahal" in wordlesolver.pattern_check(pattern, "array"), "Pattern check not working, case 1."
+    assert "nahal" not in wordlesolver.pattern_check(pattern, "jails"), "Pattern check not working, case 2."
 
 if __name__ == "__main__":
     test_pattern_gen()
