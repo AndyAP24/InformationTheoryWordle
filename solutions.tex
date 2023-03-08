@@ -1,13 +1,57 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
 
-\title{Solving Wordle using Information Theory}
+\title{Solving Wordle using Information Theory: Tasks 1-6}
 \author{Andy Arrigony Pérez, Maryam Abuissa, Daniel Flores García}
 \date{March 2023}
+
 
 \begin{document}
 
 \maketitle
+
+\section{Task 1}
+
+Consider $I[T; G] = H(T) - H(T|G)$. But note that $H(T) = H(T|G)$ because $T$ and $G$ are independent. So $I[T; G] = 0$.
+
+\section{Task 2}
+
+Consider $I[T;G|P] = H(T|P) - H(T|G,P)$. But note that $H(T|P) > H(T|G,P)$, intuitively because knowing both the guess and the pattern leads to less uncertainty about $T$ than knowing just the pattern.
+
+\section{Task 3}
+
+If we know both the guess and the target, we can deduce the pattern. Hence, $H[P | G, T] = 0$.
+
+\section{Task 4}
+
+Consider: $I[T; P|G] = H(T|G) - H(T|P,G)$. But note that $H(T|G) = H(T) - I[T;G] = H(T)$, which does not depend on $\pi$. Thus, we need to minimize the subtractive term $H(T|P,G)$ (since it \emph{does} depend on $\pi$) in order to maximize $I[T; P|G]$.
+
+\section{Task 5}
+
+Let $R$ be the alphabet of $P$. Consider:
+
+\[
+  H[T|G,P] = \sum_{t \in W} \sum_{g \in W} \sum_{r \in R} p(t, g, r)\log (\frac{1}{p(t|g,r)}) = \sum_{t \in W} \sum_{g \in W} \sum_{r \in R} p(r | t,g)p(t,g) \log(\frac{1}{p(t|g,r)})
+\]
+
+But note that $\exists r' \in R$ s.t. $p(r'  |t,g) = 1$ and therefore $p(r^* |t,g) = 0 \, \,\forall r^* \in R$ s.t. $r* \neq r'$. Therefore:
+
+\[
+    = \sum_{t \in W} \sum_{g \in W} p(t,g) \log (\frac{1}{p(t|g,r')})
+\]
+
+Moreover, by uniformity of $T$, $p(t|g,r') = \frac{1}{|W'(g,t)|}$, where $W'(g,t)$ is a pruned alphabet. Moreover, changing the summation order:
+
+\[
+    = \sum_{g \in W} \sum_{t \in W} p(t,g) \log(|W'(g,t)|) = \sum_{g \in W} \sum_{t \in W} p(t)p(g) \log(|W'(g,t)|) = \frac{1}{|W|} \sum_{g \in W} \pi(g) \sum_{t \in W}  \log(|W'(g,t)|)
+\]
+
+And letting $\alpha_g = \sum_{t \in W}  \log(|W'(g,t)|)$:
+
+\[
+    = \frac{1}{|W|}\sum_{g \in W} \pi(g) \alpha_g   
+\]
 
 \section{Task 6}
 
