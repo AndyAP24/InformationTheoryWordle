@@ -24,20 +24,21 @@
 
 import math
 import sys
+import emoji
 import random
 import itertools as it
 from collections import defaultdict
 
+# Global variables:
 
-#Global variables:
-
-#Possible words left
+# Possible words left
 words = []
 
-#Possible patterns left
 
-#Filter words based on a guess made and resulting pattern.
-#TODO: Optimize this piece of crap.
+# Possible patterns left
+
+# Filter words based on a guess made and resulting pattern.
+# TODO: Optimize this piece of crap.
 def filter_words(guess, pattern):
     global words
     new_words = []
@@ -46,21 +47,22 @@ def filter_words(guess, pattern):
             new_words.append(word)
     return new_words
 
-#Calculate entropy of of the target at each step over the possible words left.
+
+# Calculate entropy of of the target at each step over the possible words left.
 def calculate_entropy(some_words):
     if len(some_words) == 0:
         return 0
     entropy = math.log2(len(some_words))
     return entropy
 
-#Pick a guess. This is the meat of the program. 
-#For every possible guess resulting in every possible pattern, calculate the entropy of the target.
-#Pick the guess that results in the lowest entropy average over all patterns.
-def pick_guess():
+
+# Pick a guess. This is the meat of the program.
+# For every possible guess resulting in every possible pattern, calculate the entropy of the target.
+# Pick the guess that results in the lowest entropy average over all patterns.
+def pick_guess(target):
     global words
 
-
-    print ("words: ", len(words))
+    print("words: ", len(words))
 
     min_alpha = float("inf")
     best_guess = "No guess found"
@@ -79,94 +81,100 @@ def pick_guess():
             else:
                 pattern_dict[pattern] = count + 1
         alpha = 0
+        # print(f"Finding alpha for {guess}")
         # Iterate through each pattern and add log of the size of the pruned alphabet
         for w in words:
             p = generate_pattern(guess, w)
             count = pattern_dict[p]
             alpha = alpha + math.log2(count)
-        
+            # print(f"Adding to alpha with {w}, count is {count}")
+
         # alpha = alpha / len(pattern_dictn
         # print(guess + " " + str(pattern_dict) + " " + str(alpha))
         if alpha < min_alpha:
+            # print(f"guess {guess} has min_alpha {alpha}")
             min_alpha = alpha
             best_guess = guess
-
-        
-    print(best_guess, min_alpha)
+            
+    pattern = generate_pattern(best_guess, target)
+    print(best_guess, min_alpha, emoji_pattern(pattern))
     return best_guess
 
 
-#Generate pattern after a guess has been made.
+# Generate pattern after a guess has been made.
 def generate_pattern(guess, target):
     pattern = ["B", "B", "B", "B", "B"]
-    #Make target a list so we can replace letters.
+    # Make target a list so we can replace letters.
     target = list(target)
     guess = list(guess)
 
-    #If the letter is in the same position, it's green.
-    #If the letter is in the word, but not in the same position, it's yellow (But be careful not to count the same letter twice)
-    #If the letter is not in the word, it's black.
+    # If the letter is in the same position, it's green.
+    # If the letter is in the word, but not in the same position, it's yellow (But be careful not to count the same letter twice)
+    # If the letter is not in the word, it's black.
     for i in range(len(target)):
         if target[i] == guess[i]:
             pattern[i] = "G"
             target[i] = " "
             guess[i] = " "
-    
+
     for i in range(len(target)):
         if guess[i] in target and guess[i] != " ":
             pattern[i] = "Y"
             target[target.index(guess[i])] = " "
             guess[i] = " "
-    
 
-
-        
-
-    
     return "".join(pattern)
-        
 
-#Load words from file
+
+# Load words from file
 def load_words(file):
     words = []
     with open(file, "r") as f:
         for line in f:
             word = line.strip().lower()
             if len(word) == 5:
-                words.append(word) 
+                words.append(word)
             else:
                 print("Invalid word of length different than 5: {}".format(word))
                 sys.exit(1)
     return words
 
 
+def emoji_pattern(pattern):
+    pattern_emoji = ""
+    for color in pattern:
+        if color == "G":
+            pattern_emoji += emoji.emojize(":green_square:")
+        elif color == "Y":
+            pattern_emoji += emoji.emojize(":yellow_square:")
+        else:
+            pattern_emoji += emoji.emojize(":black_large_square:")
+    return pattern_emoji
 
-#This is supposed to do the whole thing.
+
+# This is supposed to do the whole thing.
 def wordlesolver(words_file, target):
-    global words; words = load_words(words_file)
+    global words;
+    words = load_words(words_file)
     if target not in words:
         print("Target not in words file")
         sys.exit(1)
 
-    guess = pick_guess()
+    guess = pick_guess(target)
     # guess = "crane"
 
-    #Do the above steps in a loop until you get the target.
+    # Do the above steps in a loop until you get the target.
     while guess != target:
-        
-        
+
         pattern = generate_pattern(guess, target)
-        print (pattern)
         words = filter_words(guess, pattern)
         
-        if guess == target:
-            print ("Target found")
-            sys.exit(0)
         if len(words) == 0:
             print("No words left")
             sys.exit(1)
-        
-        guess = pick_guess()
+
+        guess = pick_guess(target)
+    print("Target found!")
 
 
 def pattern_check(p, t):
@@ -179,12 +187,11 @@ def pattern_check(p, t):
     return filter_words(t, p)
 
 
-
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: python wordlesolver.py words_file target")
         sys.exit(1)
-    
+
     words_file = sys.argv[1]
     target = sys.argv[2].lower()
     wordlesolver(words_file, target)
