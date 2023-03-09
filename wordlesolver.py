@@ -128,8 +128,8 @@ def wordlesolver(words_file, target):
         print("Target not in words file")
         sys.exit(1)
 
-    guess = pick_guess(target)
-    # guess = "crane"
+    # guess = pick_guess(target)
+    guess = "tares"
 
     # Do the above steps in a loop until you get the target
     while guess != target:
