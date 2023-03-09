@@ -1,44 +1,15 @@
 # Task 7: Implement a program worldesolver that takes two command line arguments (in the following order):
-
-# file: a file with a list of five-letters words, one word per line;
-# target*: a word that is present in the file, representing the target.
-# Your program must then print on standard output, one per line, the sequence of guesses it makes to guess `target*, together with the value of H(T∣G,P)
-#  (i.e., the value of the objective function for the guess) for each guess, and the obtained pattern, in the form
-
-# guess1, H(T | G, P), YBGYB
-# guess2,  H(T | G, P), YYGGB
-# ...
-# target,  0, GGGGG
-# where, in the pattern, Y denotes a yellow square, B a black one, and G a green one. Extra credit: colored square emojis in place of the letters.
-
-# An example file is attached below. Hint: While developing your program use a small subset of this file, or you will wait a long time for every run, unless you follow another hint below.
-
-# You can use any programming language you want, as long as it is Python or Java =). If using Python, it must be possible to call your program with python wordlesolver.py file target. If using Java, your program must run with java Wordlesolver file target. If you really want to use a different programming language, please ask Matteo first, and add instructions on how to compile/run your program at the top of the README file included in your submission (see below).
-
-# I expect your program to behave "well" (i.e., print an informative error message on standard error and exit) when the number of command line arguments is wrong, or file does not exist or is malformed (e.g., contains words of length different than five), or when target is not in file, or in any other case of error.
-
 # Hint: given a target, the number of target words compatible with a pattern does not change from one round to another. Thus, assuming the dictionary of possible targets does not change, you can precompute it once for every possible combination of target and pattern, and have your program load these values from a file at the beginning of its execution. Doing this will greatly speed up the execution of your program.
-
-# Hint: when filtering W
-# , first eliminate the words non compatible with the black squares in the pattern, then those non compatible with the green squares in the pattern, and then those among the leftovers that are not compatible with the yellow squares. Doing this filtering correctly is trickier than it may look at first. =) Don't forget to filter out your guess.
 
 import math
 import sys
 import emoji
-import random
-import itertools as it
-from collections import defaultdict
 
-# Global variables:
-
-# Possible words left
+# Dictionary, pruned as we go
 words = []
 
 
-# Possible patterns left
-
-# Filter words based on a guess made and resulting pattern.
-# TODO: Optimize this piece of crap.
+# Filter words based on a guess made and resulting pattern
 def filter_words(guess, pattern):
     global words
     new_words = []
@@ -48,7 +19,7 @@ def filter_words(guess, pattern):
     return new_words
 
 
-# Calculate entropy of of the target at each step over the possible words left.
+# Calculate entropy of the target at each step over the possible words left
 def calculate_entropy(some_words):
     if len(some_words) == 0:
         return 0
@@ -56,9 +27,7 @@ def calculate_entropy(some_words):
     return entropy
 
 
-# Pick a guess. This is the meat of the program.
-# For every possible guess resulting in every possible pattern, calculate the entropy of the target.
-# Pick the guess that results in the lowest entropy average over all patterns.
+# For every combination of guess and target, calculate alpha and pick the target with the lowest alpha
 def pick_guess(target):
     global words
 
@@ -80,9 +49,9 @@ def pick_guess(target):
                 pattern_dict[pattern] = 1
             else:
                 pattern_dict[pattern] = count + 1
-        alpha = 0
         # print(f"Finding alpha for {guess}")
-        # Iterate through each pattern and add log of the size of the pruned alphabet
+        # Calculate alpha
+        alpha = 0
         for w in words:
             p = generate_pattern(guess, w)
             count = pattern_dict[p]
@@ -95,33 +64,31 @@ def pick_guess(target):
             # print(f"guess {guess} has min_alpha {alpha}")
             min_alpha = alpha
             best_guess = guess
-            
+
     pattern = generate_pattern(best_guess, target)
     print(best_guess, min_alpha, emoji_pattern(pattern))
     return best_guess
 
 
-# Generate pattern after a guess has been made.
-def generate_pattern(guess, target):
+# Generate pattern after a guess has been made
+def generate_pattern(guess, t):
     pattern = ["B", "B", "B", "B", "B"]
-    # Make target a list so we can replace letters.
-    target = list(target)
+    # Make target a list so we can replace letters
+    t = list(t)
     guess = list(guess)
 
-    # If the letter is in the same position, it's green.
-    # If the letter is in the word, but not in the same position, it's yellow (But be careful not to count the same letter twice)
-    # If the letter is not in the word, it's black.
-    for i in range(len(target)):
-        if target[i] == guess[i]:
+    # Follow rules to generate pattern
+    for i in range(len(t)):
+        if t[i] == guess[i]:
             pattern[i] = "G"
-            target[i] = " "
-            guess[i] = " "
+            t[i] = None
+            guess[i] = ""
 
-    for i in range(len(target)):
-        if guess[i] in target and guess[i] != " ":
+    for i in range(len(t)):
+        if guess[i] in t:
             pattern[i] = "Y"
-            target[target.index(guess[i])] = " "
-            guess[i] = " "
+            t[t.index(guess[i])] = None
+            guess[i] = ""
 
     return "".join(pattern)
 
@@ -140,6 +107,7 @@ def load_words(file):
     return words
 
 
+# Translate a pattern of "Y", "G", "B" into emojis
 def emoji_pattern(pattern):
     pattern_emoji = ""
     for color in pattern:
@@ -152,9 +120,9 @@ def emoji_pattern(pattern):
     return pattern_emoji
 
 
-# This is supposed to do the whole thing.
+# Run the solver
 def wordlesolver(words_file, target):
-    global words;
+    global words
     words = load_words(words_file)
     if target not in words:
         print("Target not in words file")
@@ -163,7 +131,7 @@ def wordlesolver(words_file, target):
     guess = pick_guess(target)
     # guess = "crane"
 
-    # Do the above steps in a loop until you get the target.
+    # Do the above steps in a loop until you get the target
     while guess != target:
 
         pattern = generate_pattern(guess, target)
@@ -174,9 +142,10 @@ def wordlesolver(words_file, target):
             sys.exit(1)
 
         guess = pick_guess(target)
+
     print("Target found!")
 
-
+# Helper method for test_pattern_check() tester method
 def pattern_check(p, t):
     words_file = "wordlewords.txt"
     global words
