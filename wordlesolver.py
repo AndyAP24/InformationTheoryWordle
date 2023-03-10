@@ -31,7 +31,7 @@ def calculate_entropy(some_words):
 def pick_guess(target):
     global words
 
-    print("words: ", len(words))
+    # print("words: ", len(words))
 
     min_alpha = float("inf")
     best_guess = "No guess found"
@@ -66,7 +66,7 @@ def pick_guess(target):
             best_guess = guess
 
     pattern = generate_pattern(best_guess, target)
-    print(best_guess, min_alpha, emoji_pattern(pattern))
+    print(f"{best_guess}, {round(min_alpha, 2)}, {emoji_pattern(pattern)}")
     return best_guess
 
 
@@ -128,8 +128,12 @@ def wordlesolver(words_file, target):
         print("Target not in words file")
         sys.exit(1)
 
-    # guess = pick_guess(target)
+    # This guess is hardcoded from a full run we did (which took ~30 min)
+    # guess = pick_guess(target) - 10:23 to __:__
     guess = "tares"
+    alpha = 0
+    pattern = generate_pattern(guess, target)
+    print(f"{guess}, alpha, {emoji_pattern(pattern)}")
 
     # Do the above steps in a loop until you get the target
     while guess != target:
